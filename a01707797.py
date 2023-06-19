@@ -19,10 +19,24 @@ mapa['Police District'] = df['Police District']
 mapa['Neighborhood'] = df['Analysis Neighborhood']
 mapa['Incident Category'] = df['Incident Category']
 mapa['Incident Subcategory'] = df['Incident Subcategory']
+mapa['Year'] = df['Incident Year']
 mapa['Resolution'] = df['Resolution']
 mapa['lat'] = df['Latitude']
 mapa['lon'] = df['Longitude']
+mapa['Incident Day'] = df['Incident Day of Week']
+mapa['Incident Type'] = df['Report Type Description']
+mapa['Report Type'] = df['Report Type Code']
+mapa['Hour'] = df['Incident Time']
+mapa['Report Datetime'] = df['Report Datetime']
 mapa = mapa.dropna()
+
+
+subset_data3=mapa
+police_district_input = st.sidebar.multiselect(
+'Choose the year',
+mapa.groupby('Year').count().reset_index()['Year'].tolist())
+if len(police_district_input) > 0:
+    subset_data2 = mapa[mapa['Year'].isin(police_district_input)]
 
 subset_data2 = mapa
 police_district_input = st.sidebar.multiselect(
@@ -54,8 +68,25 @@ st.markdown('**Crimes ocurred per Police District**')
 st.bar_chart(subset_data['Police District'].value_counts())
 st.markdown('**Crimes ocurred per date**')
 st.line_chart(subset_data['Date'].value_counts())
+st.markdown('**Time in which the crime is executed**')
+st.line_chart(subset_data['Report Datetime'].value_counts())
 st.markdown('**Type of crimes committed**')
 st.bar_chart(subset_data['Incident Category'].value_counts())
+st.markdown('**Day of the week with the highest incidences**')
+st.bar_chart(subset_data['Incident Day'].value_counts())
+st.markdown('**Incident type**')
+fig2, ax2 = plt.subplots()
+labels = subset_data['Incident Type'].unique()
+ax2.pie(subset_data['Incident Type'].value_counts(), labels=labels, autopct='%1.1f%%', startangle=20)
+st.pyplot(fig2)
+st.markdown('**Report Type**')
+fig3, ax3 = plt.subplots()
+labels = subset_data['Report Type'].unique()
+ax3.pie(subset_data['Report Type'].value_counts(), labels=labels, autopct='%1.1f%%', startangle=20)
+st.pyplot(fig3)
+st.markdown('**Time when most incidents occur**')
+st.line_chart(subset_data['Hour'].value_counts())
+
 
 agree = st.button('Click to see Incident Subcategories')
 if agree:
